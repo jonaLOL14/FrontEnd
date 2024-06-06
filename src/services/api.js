@@ -2,7 +2,7 @@
 import axios from 'axios'
 
 const apiClient = axios.create({
-    baseURL: 'https://api-register-clients.vercel.app',
+    baseURL: 'https://backend-web-taupe.vercel.app',
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json'
