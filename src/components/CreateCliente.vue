@@ -20,6 +20,7 @@
 
             <button type="submit">Crear</button>
         </form>
+        <div v-if="error" class="error">{{ error }}</div>
     </div>
 </template>
 
@@ -35,13 +36,51 @@ export default {
                 Correo_electronico: '',
                 Numero_de_telefono: '',
                 Direccion: ''
-            }
+            },
+            error: ''
         }
     },
     methods: {
+        validateEmail(email) {
+            const re = /\S+@\S+\.\S+/;
+            return re.test(email);
+        },
+        validatePhone(phone) {
+            const re = /^[0-9]+$/;
+            return re.test(phone);
+        },
+        validateName(name) {
+            const re = /^[A-Za-z\s]+$/;
+            return re.test(name);
+        },
         async createCliente() {
-            await api.createCliente(this.cliente)
-            this.$router.push({ name: 'ClientesList' })
+            // Validations
+            if (!this.cliente.ID || !this.cliente.Nombre || !this.cliente.Correo_electronico || !this.cliente.Numero_de_telefono || !this.cliente.Direccion) {
+                this.error = 'Todos los campos son obligatorios.';
+                return;
+            }
+
+            if (!this.validateEmail(this.cliente.Correo_electronico)) {
+                this.error = 'El correo electrónico no tiene un formato válido.';
+                return;
+            }
+
+            if (!this.validatePhone(this.cliente.Numero_de_telefono)) {
+                this.error = 'El número de teléfono solo debe contener números.';
+                return;
+            }
+
+            if (!this.validateName(this.cliente.Nombre)) {
+                this.error = 'El nombre solo debe contener letras y espacios.';
+                return;
+            }
+
+            try {
+                await api.createCliente(this.cliente)
+                this.$router.push({ name: 'ClientesList' })
+            } catch (err) {
+                this.error = 'Hubo un error al crear el cliente. Inténtalo nuevamente.';
+            }
         }
     }
 }
@@ -78,5 +117,10 @@ button {
 
 button:hover {
     background-color: #357a58;
+}
+
+.error {
+    color: red;
+    margin-top: 10px;
 }
 </style>
